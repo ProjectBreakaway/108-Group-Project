@@ -1,0 +1,15 @@
+p{
+    color:purple;
+}
+body{
+    color:orange;
+}
+label{
+    color: black;
+}
+table, tr, td{
+    border: 1px solid silver;
+}
+button{
+    color:purple;
+}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+  <h2>Welcome, {{current_user.username}}</h2>
+  <h3>Your Courses</h3>
+  <ul>
+    {% for c in courses %}
+      <li><a href="{{ url_for('teacher_course',cid=c.id) }}">{{c.name}}</a>
+          ({{c.enrollments|length}} students)</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,132 @@
+/* Global styles */
+body {
+    font-family: sans-serif;
+    background: #eef2f3;
+    margin: 0;
+  }
+  
+  /* Header */
+  header {
+    background: #cce;
+    padding: 10px;
+  }
+  header h1 {
+    margin: 0;
+  }
+  nav a {
+    margin-right: 10px;
+    color: #004;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Flash messages */
+  .flash {
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .flash.success {
+    background: #e0ffe0;
+    border: 1px solid #8f8;
+  }
+  .flash.danger {
+    background: #ffe0e0;
+    border: 1px solid #f88;
+  }
+  .flash.warning {
+    background: #fff0c0;
+    border: 1px solid #ee0;
+  }
+  
+  /* Main content */
+  main {
+    padding: 20px;
+  }
+  
+  /* Tables */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .table th,
+  .table td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: left;
+  }
+  .table th {
+    background: #dde;
+  }
+  
+  /* Buttons & links */
+  .btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: background 0.2s ease;
+  }
+  .btn:hover {
+    background: #218838;
+  }
+  .btn:disabled,
+  .btn[disabled] {
+    background: #aaa;
+    cursor: default;
+  }
+  
+  /* Logout button override */
+  .logout-btn {
+    background: #dc3545;      /* red */
+    box-shadow: none;
+    font-weight: normal;
+  }
+  .logout-btn:hover {
+    background: #c82333;
+  }
+  
+  /* Login form */
+  .login-form {
+    max-width: 320px;
+    margin: 60px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  .login-form div {
+    margin-bottom: 12px;
+  }
+  .login-form label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+  .login-form input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .login-form {
+      margin: 20px;
+      padding: 16px;
+    }
+    .table th,
+    .table td {
+      padding: 6px;
+    }
+  }
+  

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+  <h2>Welcome, {{current_user.username}}</h2>
+  <h3>Your Classes</h3>
+  <table class="table">
+    <tr><th>Name</th><th>Teacher</th><th>Grade</th></tr>
+    {% for e in enrolled %}
+      <tr>
+        <td>{{e.course.name}}</td>
+        <td>{{e.course.teacher.username}}</td>
+        <td>{{e.grade or '–'}}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="3">You’re not enrolled in anything yet.</td></tr>
+    {% endfor %}
+  </table>
+
+  <h3>All Offered Classes</h3>
+  <table class="table">
+    <tr><th>Name</th><th>Teacher</th><th>Enrolled/Cap</th><th>Action</th></tr>
+    {% for c in all_courses %}
+      <tr>
+        <td>{{c.name}}</td>
+        <td>{{c.teacher.username}}</td>
+        <td>{{c.enrollments|length}} / {{c.capacity}}</td>
+        <td>
+          {% if c.enrollments|length < c.capacity %}
+            <a href="{{ url_for('enroll_course',cid=c.id) }}" class="btn">Enroll</a>
+          {% else %}
+            Full
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} User{% endblock %}
+
+{% block content %}
+  <h2>{{ action }} User</h2>
+  <form method="post" class="login-form">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.username.label }}<br>
+      {{ form.username(size=32) }}
+      {% for err in form.username.errors %}
+        <div class="error-message">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      {{ form.role.label }}<br>
+      {{ form.role() }}
+      {% for err in form.role.errors %}
+        <div class="error-message">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <div>
+      {{ form.password.label }}<br>
+      {{ form.password() }}
+      {% if action=='Edit' %}
+        <small>(leave blank to keep existing password)</small>
+      {% endif %}
+      {% for err in form.password.errors %}
+        <div class="error-message">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <div style="margin-top:12px;">
+      <button type="submit" class="btn">{{ action }}</button>
+      <a href="{{ url_for('admin_users') }}" class="btn">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

@@ -1,37 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Student Dashboard{% endblock %}
-{% block content %}
-  <h2>Welcome, {{current_user.username}}</h2>
-  <h3>Your Classes</h3>
-  <table class="table">
-    <tr><th>Name</th><th>Teacher</th><th>Grade</th></tr>
-    {% for e in enrolled %}
-      <tr>
-        <td>{{e.course.name}}</td>
-        <td>{{e.course.teacher.username}}</td>
-        <td>{{e.grade or '–'}}</td>
-      </tr>
-    {% else %}
-      <tr><td colspan="3">You’re not enrolled in anything yet.</td></tr>
-    {% endfor %}
-  </table>
 
-  <h3>All Offered Classes</h3>
-  <table class="table">
-    <tr><th>Name</th><th>Teacher</th><th>Enrolled/Cap</th><th>Action</th></tr>
+{% block content %}
+  <h2>My Classes</h2>
+  {% if enrolled %}
+    <ul>
+      {% for enr in enrolled %}
+        <li>
+          {{ enr.course.name }} —
+          Grade: {{ enr.grade if enr.grade is not none else 'N/A' }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have not enrolled in any classes yet.</p>
+  {% endif %}
+
+  <h2>All Courses</h2>
+  <ul>
     {% for c in all_courses %}
-      <tr>
-        <td>{{c.name}}</td>
-        <td>{{c.teacher.username}}</td>
-        <td>{{c.enrollments|length}} / {{c.capacity}}</td>
-        <td>
-          {% if c.enrollments|length < c.capacity %}
-            <a href="{{ url_for('enroll_course',cid=c.id) }}" class="btn">Enroll</a>
-          {% else %}
-            Full
-          {% endif %}
-        </td>
-      </tr>
+      <li>
+        {{ c.name }} ({{ c.enrollments|length }}/{{ c.capacity }})
+        <a href="{{ url_for('student_enroll', course_id=c.id) }}"
+           class="btn btn-sm">Enroll</a>
+      </li>
     {% endfor %}
-  </table>
+  </ul>
 {% endblock %}

@@ -35,3 +35,4 @@ class AdminUserForm(FlaskForm):
         description="(leave blank to keep current password)"
     )
     submit = SubmitField("Save")
+    

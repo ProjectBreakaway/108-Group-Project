@@ -8,7 +8,10 @@
     {% if enrolled %}
       <ul>
         {% for enr in enrolled %}
-          <li>{{ enr.course.name }} — Grade: {% if enr.grade is not none %}{{ enr.grade }}{% else %}N/A{% endif %}</li>
+          <li>
+            {{ enr.course.name }} —
+            Grade: {% if enr.grade is not none %}{{ enr.grade }}{% else %}N/A{% endif %}
+          </li>
         {% endfor %}
       </ul>
     {% else %}
@@ -22,9 +25,17 @@
       {% for c in all_courses %}
       <li>
         {{ c.name }} ({{ c.enrollments|length }}/{{ c.capacity }})
-        <a href="{{ url_for('student_enroll', course_id=c.id) }}" class="btn enroll-btn">
-          Enroll
-        </a>
+        {% if c.id in enrolled_ids %}
+          <a href="{{ url_for('student_unenroll', course_id=c.id) }}"
+             class="btn unenroll-btn">
+            Unenroll
+          </a>
+        {% else %}
+          <a href="{{ url_for('student_enroll', course_id=c.id) }}"
+             class="btn enroll-btn">
+            Enroll
+          </a>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>

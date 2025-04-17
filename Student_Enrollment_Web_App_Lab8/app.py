@@ -167,10 +167,13 @@ def admin_delete_user(user_id):
 def student_dashboard():
     if current_user.role != "student":
         return redirect(url_for("home"))
+    enrolled = current_user.enrollments
+    enrolled_ids = [enr.course_id for enr in enrolled]
     return render_template(
         "student_dashboard.html",
-        enrolled=current_user.enrollments,
-        all_courses=Course.query.all()
+        enrolled=enrolled,
+        all_courses=Course.query.all(),
+        enrolled_ids=enrolled_ids
     )
 
 
@@ -180,7 +183,14 @@ def student_enroll(course_id):
     if current_user.role != "student":
         return redirect(url_for("home"))
     course = Course.query.get_or_404(course_id)
-    if len(course.enrollments) >= course.capacity:
+
+    existing = Enrollment.query.filter_by(
+        student_id=current_user.id,
+        course_id=course.id
+    ).first()
+    if existing:
+        flash("Already enrolled in this course.", "info")
+    elif len(course.enrollments) >= course.capacity:
         flash("Class full.", "warning")
     else:
         db.session.add(Enrollment(
@@ -189,6 +199,27 @@ def student_enroll(course_id):
         ))
         db.session.commit()
         flash(f"Enrolled in {course.name}", "success")
+
+    return redirect(url_for("student_dashboard"))
+
+
+# ─── Unenroll ───────────────────────────────────────────────────────────────
+@app.route("/student/unenroll/<int:course_id>")
+@login_required
+def student_unenroll(course_id):
+    if current_user.role != "student":
+        return redirect(url_for("home"))
+    enr = Enrollment.query.filter_by(
+        student_id=current_user.id,
+        course_id=course_id
+    ).first()
+    if not enr:
+        flash("You are not enrolled in this course.", "info")
+    else:
+        course_name = enr.course.name
+        db.session.delete(enr)
+        db.session.commit()
+        flash(f"Unenrolled from {course_name}", "success")
     return redirect(url_for("student_dashboard"))
 
 
@@ -239,3 +270,5 @@ def init_db():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
+
+

@@ -1,43 +1,66 @@
 {% extends "base.html" %}
-
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-  <section>
-    <h2>Your Enrolled Classes</h2>
-    {% if enrolled %}
-      <ul>
+<section>
+  <h2>Your Enrolled Classes</h2>
+  {% if enrolled %}
+    <table class="courses-table">
+      <thead>
+        <tr>
+          <th>Course Name</th><th>Time</th><th>Teacher</th>
+          <th>Capacity</th><th>Grade</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
         {% for enr in enrolled %}
-          <li>
-            {{ enr.course.name }} —
-            Grade: {% if enr.grade is not none %}{{ enr.grade }}{% else %}N/A{% endif %}
-          </li>
+        <tr>
+          <td>{{ enr.course.name }}</td>
+          <td>{{ enr.course.time }}</td>
+          <td>{{ enr.course.teacher.username }}</td>
+          <td>{{ enr.course.enrollments|length }}/{{ enr.course.capacity }}</td>
+          <td>{% if enr.grade is not none %}{{ enr.grade }}{% else %}N/A{% endif %}</td>
+          <td>
+            <a href="{{ url_for('student_unenroll', course_id=enr.course.id) }}"
+               class="btn unenroll-btn">Unenroll</a>
+          </td>
+        </tr>
         {% endfor %}
-      </ul>
-    {% else %}
-      <p>You’re not enrolled in anything yet.</p>
-    {% endif %}
-  </section>
+      </tbody>
+    </table>
+  {% else %}
+    <p>You’re not enrolled in anything yet.</p>
+  {% endif %}
+</section>
 
-  <section>
-    <h2>All Available Classes</h2>
-    <ul>
+<section>
+  <h2>All Available Classes</h2>
+  <table class="courses-table">
+    <thead>
+      <tr>
+        <th>Course Name</th><th>Time</th><th>Teacher</th>
+        <th>Capacity</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
       {% for c in all_courses %}
-      <li>
-        {{ c.name }} ({{ c.enrollments|length }}/{{ c.capacity }})
-        {% if c.id in enrolled_ids %}
-          <a href="{{ url_for('student_unenroll', course_id=c.id) }}"
-             class="btn unenroll-btn">
-            Unenroll
-          </a>
-        {% else %}
-          <a href="{{ url_for('student_enroll', course_id=c.id) }}"
-             class="btn enroll-btn">
-            Enroll
-          </a>
-        {% endif %}
-      </li>
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.time }}</td>
+        <td>{{ c.teacher.username }}</td>
+        <td>{{ c.enrollments|length }}/{{ c.capacity }}</td>
+        <td>
+          {% if c.id in enrolled_ids %}
+            <a href="{{ url_for('student_unenroll', course_id=c.id) }}"
+               class="btn unenroll-btn">Unenroll</a>
+          {% else %}
+            <a href="{{ url_for('student_enroll', course_id=c.id) }}"
+               class="btn enroll-btn">Enroll</a>
+          {% endif %}
+        </td>
+      </tr>
       {% endfor %}
-    </ul>
-  </section>
+    </tbody>
+  </table>
+</section>
 {% endblock %}

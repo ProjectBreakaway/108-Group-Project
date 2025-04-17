@@ -42,7 +42,6 @@ login_manager.login_view = "login"
 def load_user(uid):
     return db.session.get(User, int(uid))
 
-
 def admin_required(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
@@ -51,22 +50,19 @@ def admin_required(f):
         return f(*args, **kwargs)
     return wrapped
 
-
-# ─── Flask‑Admin for models ─────────────────────────────────────────────────
+# Flask‑Admin for models 
 class SecureModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.role == "admin"
 
-
+# Flask‑Admin configuration  (only lists updated)
 class CourseAdmin(SecureModelView):
-    column_list  = ["id", "name", "capacity", "teacher.username"]
-    form_columns = ["name", "capacity", "teacher_id"]
-
+    column_list  = ["id", "name", "time", "capacity", "teacher.username"]  # added time
+    form_columns = ["name", "time", "capacity", "teacher_id"]              # added time
 
 class EnrollmentAdmin(SecureModelView):
     column_list  = ["id", "student.username", "course.name", "grade"]
     form_columns = ["student_id", "course_id", "grade"]
-
 
 admin = Admin(app, name="University Admin", template_mode="bootstrap4")
 admin.add_view(CourseAdmin(Course, db.session))
@@ -74,8 +70,7 @@ admin.add_view(EnrollmentAdmin(Enrollment, db.session))
 admin.add_link(MenuLink(name="Users", url="/admin/users"))
 admin.add_link(MenuLink(name="Logout", url="/logout"))
 
-
-# ─── Routes ─────────────────────────────────────────────────────────────────
+# Routes 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -90,13 +85,11 @@ def login():
         flash("Invalid username or password", "danger")
     return render_template("login.html", form=form)
 
-
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return render_template("logged_out.html")
-
 
 @app.route("/")
 def home():
@@ -108,7 +101,6 @@ def home():
         return redirect(url_for("teacher_dashboard"))
     return redirect(url_for("student_dashboard"))
 
-
 # ─── Admin: Custom User CRUD ────────────────────────────────────────────────
 @app.route("/admin/users")
 @login_required
@@ -116,7 +108,6 @@ def home():
 def admin_users():
     users = User.query.order_by(User.id).all()
     return render_template("admin_users.html", users=users)
-
 
 @app.route("/admin/users/create", methods=["GET", "POST"])
 @login_required
@@ -131,7 +122,6 @@ def admin_create_user():
         flash("User created.", "success")
         return redirect(url_for("admin_users"))
     return render_template("admin_user_form.html", form=form, action="Create")
-
 
 @app.route("/admin/users/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -149,7 +139,6 @@ def admin_edit_user(user_id):
         return redirect(url_for("admin_users"))
     return render_template("admin_user_form.html", form=form, action="Edit")
 
-
 @app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
 @login_required
 @admin_required
@@ -160,7 +149,6 @@ def admin_delete_user(user_id):
     flash("User deleted.", "success")
     return redirect(url_for("admin_users"))
 
-
 # ─── Student ────────────────────────────────────────────────────────────────
 @app.route("/student")
 @login_required
@@ -168,14 +156,14 @@ def student_dashboard():
     if current_user.role != "student":
         return redirect(url_for("home"))
     enrolled = current_user.enrollments
-    enrolled_ids = [enr.course_id for enr in enrolled]
+    enrolled_ids = [e.course_id for e in enrolled]
+    all_courses = Course.query.all()
     return render_template(
         "student_dashboard.html",
         enrolled=enrolled,
-        all_courses=Course.query.all(),
-        enrolled_ids=enrolled_ids
+        enrolled_ids=enrolled_ids,
+        all_courses=all_courses
     )
-
 
 @app.route("/student/enroll/<int:course_id>")
 @login_required
@@ -183,13 +171,8 @@ def student_enroll(course_id):
     if current_user.role != "student":
         return redirect(url_for("home"))
     course = Course.query.get_or_404(course_id)
-
-    existing = Enrollment.query.filter_by(
-        student_id=current_user.id,
-        course_id=course.id
-    ).first()
-    if existing:
-        flash("Already enrolled in this course.", "info")
+    if course.id in [e.course_id for e in current_user.enrollments]:
+        flash("Already enrolled.", "warning")
     elif len(course.enrollments) >= course.capacity:
         flash("Class full.", "warning")
     else:
@@ -199,29 +182,23 @@ def student_enroll(course_id):
         ))
         db.session.commit()
         flash(f"Enrolled in {course.name}", "success")
-
     return redirect(url_for("student_dashboard"))
 
-
-# ─── Unenroll ───────────────────────────────────────────────────────────────
 @app.route("/student/unenroll/<int:course_id>")
 @login_required
 def student_unenroll(course_id):
     if current_user.role != "student":
         return redirect(url_for("home"))
-    enr = Enrollment.query.filter_by(
-        student_id=current_user.id,
-        course_id=course_id
+    enrollment = Enrollment.query.filter_by(
+        student_id=current_user.id, course_id=course_id
     ).first()
-    if not enr:
-        flash("You are not enrolled in this course.", "info")
+    if not enrollment:
+        flash("You are not enrolled in this course.", "warning")
     else:
-        course_name = enr.course.name
-        db.session.delete(enr)
+        db.session.delete(enrollment)
         db.session.commit()
-        flash(f"Unenrolled from {course_name}", "success")
+        flash("Successfully unenrolled.", "success")
     return redirect(url_for("student_dashboard"))
-
 
 # ─── Teacher ────────────────────────────────────────────────────────────────
 @app.route("/teacher")
@@ -233,7 +210,6 @@ def teacher_dashboard():
         "teacher_dashboard.html",
         courses=current_user.taught_courses
     )
-
 
 @app.route("/teacher/course/<int:course_id>", methods=["GET", "POST"])
 @login_required
@@ -255,7 +231,6 @@ def teacher_course(course_id):
 
     return render_template("teacher_course.html", course=course)
 
-
 # ─── DB init helper ─────────────────────────────────────────────────────────
 def init_db():
     with app.app_context():
@@ -266,9 +241,6 @@ def init_db():
             db.session.add(a)
             db.session.commit()
 
-
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
-
-

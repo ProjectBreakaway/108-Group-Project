@@ -6,6 +6,8 @@ from flask import (
     flash, request, abort
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from flask_login import (
     LoginManager, login_user, logout_user,
     login_required, current_user
@@ -14,8 +16,8 @@ from flask_admin import Admin
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
-from forms import LoginForm, AdminUserForm
 from models import db, User, Course, Enrollment
+from forms import LoginForm, AdminUserForm
 
 app = Flask(__name__)
 app.config.update(
@@ -23,10 +25,16 @@ app.config.update(
     SQLALCHEMY_DATABASE_URI="sqlite:///grades.db",
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
-
 db.init_app(app)
 
-# ─── Flask‑Login setup ─────────────────────────────────────────────────────────
+# ─── Enable SQLite foreign‑key cascades ──────────────────────────────────────
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_conn, conn_record):
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON;")
+    cursor.close()
+
+# ─── Flask‑Login setup ───────────────────────────────────────────────────────
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
@@ -36,7 +44,6 @@ def load_user(uid):
 
 
 def admin_required(f):
-    """Decorator: abort(404) unless current_user is admin."""
     @wraps(f)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != "admin":
@@ -45,13 +52,10 @@ def admin_required(f):
     return wrapped
 
 
-# ─── Flask‑Admin for Course & Enrollment ───────────────────────────────────────
+# ─── Flask‑Admin for models ─────────────────────────────────────────────────
 class SecureModelView(ModelView):
     def is_accessible(self):
-        return (
-            current_user.is_authenticated and
-            current_user.role == "admin"
-        )
+        return current_user.is_authenticated and current_user.role == "admin"
 
 
 class CourseAdmin(SecureModelView):
@@ -67,19 +71,15 @@ class EnrollmentAdmin(SecureModelView):
 admin = Admin(app, name="University Admin", template_mode="bootstrap4")
 admin.add_view(CourseAdmin(Course, db.session))
 admin.add_view(EnrollmentAdmin(Enrollment, db.session))
-
-# New “Users” link in the sidebar
 admin.add_link(MenuLink(name="Users", url="/admin/users"))
-# Logout link
 admin.add_link(MenuLink(name="Logout", url="/logout"))
 
 
-# ─── Authentication routes ────────────────────────────────────────────────────
+# ─── Routes ─────────────────────────────────────────────────────────────────
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("home"))
-
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -109,7 +109,7 @@ def home():
     return redirect(url_for("student_dashboard"))
 
 
-# ─── Custom Admin User CRUD ───────────────────────────────────────────────────
+# ─── Admin: Custom User CRUD ────────────────────────────────────────────────
 @app.route("/admin/users")
 @login_required
 @admin_required
@@ -141,7 +141,7 @@ def admin_edit_user(user_id):
     form = AdminUserForm(obj=u)
     if form.validate_on_submit():
         u.username = form.username.data
-        u.role = form.role.data
+        u.role     = form.role.data
         if form.password.data:
             u.set_password(form.password.data)
         db.session.commit()
@@ -161,7 +161,7 @@ def admin_delete_user(user_id):
     return redirect(url_for("admin_users"))
 
 
-# ─── Student routes ───────────────────────────────────────────────────────────
+# ─── Student ────────────────────────────────────────────────────────────────
 @app.route("/student")
 @login_required
 def student_dashboard():
@@ -192,7 +192,7 @@ def student_enroll(course_id):
     return redirect(url_for("student_dashboard"))
 
 
-# ─── Teacher routes ───────────────────────────────────────────────────────────
+# ─── Teacher ────────────────────────────────────────────────────────────────
 @app.route("/teacher")
 @login_required
 def teacher_dashboard():
@@ -225,7 +225,7 @@ def teacher_course(course_id):
     return render_template("teacher_course.html", course=course)
 
 
-# ─── Database setup helper ────────────────────────────────────────────────────
+# ─── DB init helper ─────────────────────────────────────────────────────────
 def init_db():
     with app.app_context():
         db.create_all()

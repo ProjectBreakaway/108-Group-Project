@@ -1,28 +1,32 @@
 {% extends "base.html" %}
 
-{% block content %}
-  <h2>My Classes</h2>
-  {% if enrolled %}
-    <ul>
-      {% for enr in enrolled %}
-        <li>
-          {{ enr.course.name }} —
-          Grade: {{ enr.grade if enr.grade is not none else 'N/A' }}
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>You have not enrolled in any classes yet.</p>
-  {% endif %}
+{% block title %}Student Dashboard{% endblock %}
 
-  <h2>All Courses</h2>
-  <ul>
-    {% for c in all_courses %}
+{% block content %}
+  <section>
+    <h2>Your Enrolled Classes</h2>
+    {% if enrolled %}
+      <ul>
+        {% for enr in enrolled %}
+          <li>{{ enr.course.name }} — Grade: {% if enr.grade is not none %}{{ enr.grade }}{% else %}N/A{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You’re not enrolled in anything yet.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>All Available Classes</h2>
+    <ul>
+      {% for c in all_courses %}
       <li>
         {{ c.name }} ({{ c.enrollments|length }}/{{ c.capacity }})
-        <a href="{{ url_for('student_enroll', course_id=c.id) }}"
-           class="btn btn-sm">Enroll</a>
+        <a href="{{ url_for('student_enroll', course_id=c.id) }}" class="btn enroll-btn">
+          Enroll
+        </a>
       </li>
-    {% endfor %}
-  </ul>
+      {% endfor %}
+    </ul>
+  </section>
 {% endblock %}

@@ -1,132 +1,313 @@
-/* Global styles */
+/* ---------- Global Styles ---------- */
+* {
+  box-sizing: border-box;
+}
+
 body {
-    font-family: sans-serif;
-    background: #eef2f3;
-    margin: 0;
-  }
-  
-  /* Header */
-  header {
-    background: #cce;
-    padding: 10px;
-  }
-  header h1 {
-    margin: 0;
-  }
-  nav a {
-    margin-right: 10px;
-    color: #004;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  nav a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Flash messages */
-  .flash {
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-  }
-  .flash.success {
-    background: #e0ffe0;
-    border: 1px solid #8f8;
-  }
-  .flash.danger {
-    background: #ffe0e0;
-    border: 1px solid #f88;
-  }
-  .flash.warning {
-    background: #fff0c0;
-    border: 1px solid #ee0;
-  }
-  
-  /* Main content */
-  main {
-    padding: 20px;
-  }
-  
-  /* Tables */
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  .table th,
-  .table td {
-    border: 1px solid #aaa;
-    padding: 8px;
-    text-align: left;
-  }
-  .table th {
-    background: #dde;
-  }
-  
-  /* Buttons & links */
-  .btn {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #28a745;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    transition: background 0.2s ease;
-  }
-  .btn:hover {
-    background: #218838;
-  }
-  .btn:disabled,
-  .btn[disabled] {
-    background: #aaa;
-    cursor: default;
-  }
-  
-  /* Logout button override */
-  .logout-btn {
-    background: #dc3545;      /* red */
-    box-shadow: none;
-    font-weight: normal;
-  }
-  .logout-btn:hover {
-    background: #c82333;
-  }
-  
-  /* Login form */
-  .login-form {
-    max-width: 320px;
-    margin: 60px auto;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-  }
-  .login-form div {
-    margin-bottom: 12px;
-  }
-  .login-form label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: bold;
-  }
-  .login-form input {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  /* Responsive */
-  @media (max-width: 600px) {
-    .login-form {
-      margin: 20px;
-      padding: 16px;
-    }
-    .table th,
-    .table td {
-      padding: 6px;
-    }
-  }
-  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #eef2f3;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Site Header & Navigation ---------- */
+.site-header {
+  background-color: #ffffff;
+  padding: 15px 30px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.main-nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #0056b3;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: #004494;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #bd2130;
+}
+
+/* ---------- Page Container ---------- */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* ---------- Headings ---------- */
+h1, h2 {
+  text-align: center;
+  color: #333;
+  margin-top: 0;
+}
+
+/* ---------- Global Notification ---------- */
+.global-message {
+  background-color: #e0ffe0;
+  border: 1px solid #90ee90;
+  color: #006400;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ---------- Error & Result Messages ---------- */
+.error-message {
+  background-color: #ffe0e0;
+  border: 1px solid #ff7f7f;
+  color: #a10000;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.result-message {
+  background-color: #e0f7ff;
+  border: 1px solid #7fdfff;
+  color: #006699;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ---------- Form Grid Layout ---------- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-gap: 10px;
+  align-items: center;
+  margin: 0 auto 20px;
+  max-width: 600px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+form label {
+  text-align: right;
+  padding-right: 5px;
+}
+
+/* ---------- Inputs ---------- */
+form input[type="text"],
+form input[type="number"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* ---------- Button Base Styles ---------- */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Lookup Button */
+.lookup-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+.lookup-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Add Button */
+.add-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+.add-btn:hover {
+  background-color: #1e7e34;
+}
+
+/* Edit Buttons */
+.edit-btn,
+.edit-btn-table {
+  background-color: #ffc107;
+  color: #fff;
+}
+.edit-btn:hover,
+.edit-btn-table:hover {
+  background-color: #e0a800;
+}
+
+/* Delete Button */
+.delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+.delete-btn:hover {
+  background-color: #bd2130;
+}
+
+/* ---------- Table Styling ---------- */
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.grades-table th,
+.grades-table td {
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.grades-table th {
+  background-color: #4CAF50;
+  color: #fff;
+  font-weight: 600;
+}
+
+.grades-table td {
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.grades-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.no-grades {
+  text-align: center;
+  padding: 15px;
+  font-style: italic;
+}
+
+.actions button {
+  margin: 0 5px;
+}
+
+/* ---------- Login Page ---------- */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #eef2f3;
+  margin: 0;
+}
+
+.login-box {
+  background: #ffffff;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  text-align: center;
+}
+
+.login-header {
+  margin: 0 0 25px;
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 10px 0;
+  background-color: #0056b3;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.login-btn:hover {
+  background-color: #004494;
+}
+
+/* Flash messages under form */
+.flash-messages {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0 0;
+}
+
+.flash {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.flash.success {
+  background: #e0ffe0;
+  border: 1px solid #90ee90;
+  color: #006400;
+}
+
+.flash.danger {
+  background: #ffe0e0;
+  border: 1px solid #ff7f7f;
+  color: #a10000;
+}

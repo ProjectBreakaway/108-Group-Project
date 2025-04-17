@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 
+{% block title %}Teacher Dashboard{% endblock %}
+
 {% block content %}
-  <h2>My Classes</h2>
-  {% if courses %}
-    <ul>
-      {% for c in courses %}
-      <li>
-        <!-- fixed: use course_id, not cid -->
-        <a href="{{ url_for('teacher_course', course_id=c.id) }}">
-          {{ c.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>You’re not teaching any classes yet.</p>
-  {% endif %}
+  <section>
+    <h2>Your Courses</h2>
+    {% if courses %}
+      <ul>
+        {% for c in courses %}
+        <li>
+          <a href="{{ url_for('teacher_course', course_id=c.id) }}">
+            {{ c.name }}
+          </a>
+          ({{ c.enrollments|length }} enrolled)
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You haven’t been assigned any courses yet.</p>
+    {% endif %}
+  </section>
 {% endblock %}

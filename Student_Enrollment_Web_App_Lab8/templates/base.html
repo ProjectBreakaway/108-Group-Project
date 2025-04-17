@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{% block title %}University{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static',filename='css/styles.css') }}">
-</head>
-<body>
-  <header>
-    <h1>ACME University</h1>
-
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}University App{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
     {% if current_user.is_authenticated %}
-      <nav>
-        {% if current_user.role=='admin' %}
-          <a href="{{ url_for('admin.index') }}">Admin Panel</a> |
-        {% elif current_user.role=='student' %}
-          <a href="{{ url_for('student_dashboard') }}">My Dashboard</a> |
-        {% elif current_user.role=='teacher' %}
-          <a href="{{ url_for('teacher_dashboard') }}">My Dashboard</a> |
+    <header class="site-header">
+      <h1 class="greeting">Hello, {{ current_user.username }}!</h1>
+      <nav class="main-nav">
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('admin.index') }}">Admin Home</a>
+          <a href="{{ url_for('admin_users') }}">Users</a>
+        {% elif current_user.role == 'teacher' %}
+          <a href="{{ url_for('teacher_dashboard') }}">My Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('student_dashboard') }}">My Dashboard</a>
         {% endif %}
-        <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
       </nav>
-    {% else %}
-      <nav>
-        <a href="{{ url_for('login') }}" class="btn">Sign in</a>
-      </nav>
+    </header>
     {% endif %}
 
-    <hr>
-  </header>
-
-  <main>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for cat,msg in messages %}
-        <div class="flash {{cat}}">{{msg}}</div>
-      {% endfor %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-  </main>
-</body>
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
 </html>
